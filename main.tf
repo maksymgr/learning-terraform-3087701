@@ -33,18 +33,6 @@ module "blog_vpc" {
   }
 }
 
-resource "aws_instance" "blog" {
-  ami           = data.aws_ami.app_ami.id
-  instance_type = var.instance_type
-
-  vpc_security_group_ids = [ module.blog-sg.security_group_id ]
-  subnet_id = module.blog_vpc.public_subnets[0]
-
-  tags = {
-    Name = "HelloWorld"
-  }
-}
-
 module "blog-autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "6.5.2"
@@ -80,12 +68,6 @@ module "blog-alb" {
       backend_protocol = "HTTP"
       backend_port     = 80
       target_type      = "instance"
-      targets = [
-        {
-          target_id = aws_instance.blog.id
-          port = 80
-        }
-      ]
     }
   ]
 
